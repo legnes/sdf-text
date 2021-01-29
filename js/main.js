@@ -1,4 +1,5 @@
-import { createScene, updateTexture, render } from './webgl-utils.js';
+import { createContext, createStaticScene, createPipeline, updateTexture, render } from './webgl-utils.js';
+import shaders from '../shaders/index.js';
 
 // https://github.com/mapbox/tiny-sdf/blob/master/index.js
 // http://cs.brown.edu/people/pfelzens/papers/dt-final.pdf
@@ -18,8 +19,6 @@ import { createScene, updateTexture, render } from './webgl-utils.js';
 //      [ ] wordart
 // [X] Dynamic resolution (bypass sdf canvas)
 // [ ] Quality slider (text canvas resolution)
-
-
 const Inf = 1e20;
 
 const state = {
@@ -31,7 +30,9 @@ const state = {
   webgl: {
     canvas: null,
     ctx: null,
-  }
+    isWebgl2: false,
+    pipeline: {}
+  },
 };
 
 const initDom = () => {
@@ -43,16 +44,17 @@ const initDom = () => {
 const initGlyphs = () => {
   // TODO: add inputs for font styles
   state.glyphs.ctx = state.glyphs.canvas.getContext('2d');
-  // state.glyphs.ctx.font = 'bold 100px Arial';
-  state.glyphs.ctx.font = '30px Arial';
+  state.glyphs.ctx.font = 'bold 100px Arial';
+  // state.glyphs.ctx.font = '30px Arial';
   state.glyphs.ctx.textAlign = 'center';
 };
 
 const initWebgl = () => {
-  const gl = state.webgl.canvas.getContext('webgl2');
-  if (!gl) throw new Error('WebGL not found!');
-  state.webgl.ctx = gl;
-  createScene(gl);
+  const context = createContext(state.webgl.canvas);
+  state.webgl.ctx = context.ctx;
+  state.webgl.isWebgl2 = context.isWebgl2;
+  createStaticScene(state.webgl.ctx);
+  createPipeline(state.webgl.ctx, shaders.frag.texture, state.webgl.pipeline);
 }
 
 const init = () => {
@@ -92,8 +94,17 @@ const update = (value) => {
   }
 
   const gl = state.webgl.ctx;
-  updateTexture(gl, arrayBufferView);
-  render(gl);
+  updateTexture(gl, arrayBufferView, state.webgl.isWebgl2);
+  render(gl, state.webgl.pipeline, [
+    {
+      name: 'uSdfResolution',
+      values: [state.glyphs.canvas.width, state.glyphs.canvas.height]
+    },
+    {
+      name: 'uOutputResolution',
+      values: [state.webgl.canvas.width, state.webgl.canvas.height]
+    }
+  ]);
 };
 
 const edt = (data, width, height) => {
