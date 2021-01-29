@@ -36,7 +36,20 @@ const state = {
 };
 
 const initDom = () => {
-  document.querySelector('input').addEventListener('input', (evt) => update(evt.target.value));
+  document.querySelector('#textInput').addEventListener('input', (evt) => update(evt.target.value));
+  
+  const shaderPresetSelect = document.querySelector('#shaderPresetSelect');
+  for (const shaderName in shaders.frag) {
+    const shaderPresetOption = document.createElement('option');
+    shaderPresetOption.text = shaderName;
+    shaderPresetSelect.add(shaderPresetOption);
+  }
+  shaderPresetSelect.addEventListener('change', (evt) => {
+    const shader = shaders.frag[evt.target.value];
+    createPipeline(state.webgl.ctx, shader, state.webgl.pipeline);
+    _render();
+  });
+
   state.glyphs.canvas = document.querySelector('#glyphsCanvas');
   state.webgl.canvas = document.querySelector('#webglCanvas');
 };
@@ -95,6 +108,12 @@ const update = (value) => {
 
   const gl = state.webgl.ctx;
   updateTexture(gl, arrayBufferView, state.webgl.isWebgl2);
+  
+  _render();
+};
+
+const _render = () => {
+  const gl = state.webgl.ctx;
   render(gl, state.webgl.pipeline, [
     {
       name: 'uSdfResolution',
