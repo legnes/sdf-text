@@ -1,6 +1,8 @@
 import simplePositionVert from './simple-position-vert.js';
 import debugFrag from './debug-frag.js';
-import textureFrag from './texture-frag.js';
+import rawFrag from './raw-frag.js';
+import outlineFrag from './outline-frag.js';
+import dropShadowFrag from './drop-shadow-frag.js';
 
 const shaders = {
   vert: {
@@ -8,7 +10,9 @@ const shaders = {
   },
   frag: {
     debug: debugFrag,
-    texture: textureFrag,
+    raw: rawFrag,
+    outline: outlineFrag,
+    dropShadow: dropShadowFrag,
   },
 };
 

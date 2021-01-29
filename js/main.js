@@ -54,7 +54,7 @@ const initWebgl = () => {
   state.webgl.ctx = context.ctx;
   state.webgl.isWebgl2 = context.isWebgl2;
   createStaticScene(state.webgl.ctx);
-  createPipeline(state.webgl.ctx, shaders.frag.texture, state.webgl.pipeline);
+  createPipeline(state.webgl.ctx, shaders.frag.outline, state.webgl.pipeline);
 }
 
 const init = () => {
