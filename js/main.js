@@ -9,7 +9,13 @@ import { createScene, updateTexture, render } from './webgl-utils.js';
 // [ ] Font inputs
 // [ ] Editable shaders
 // [ ] More shader variables
+//      [ ] time
+//      [ ] tex res
+//      [ ] out res
 // [ ] Different shader styles
+//      [ ] raw
+//      [ ] outline
+//      [ ] wordart
 // [X] Dynamic resolution (bypass sdf canvas)
 // [ ] Quality slider (text canvas resolution)
 
@@ -22,10 +28,6 @@ const state = {
     canvas: null,
     ctx: null,
   },
-  sdf: {
-    canvas: null,
-    ctx: null,
-  },
   webgl: {
     canvas: null,
     ctx: null,
@@ -35,7 +37,6 @@ const state = {
 const initDom = () => {
   document.querySelector('input').addEventListener('input', (evt) => update(evt.target.value));
   state.glyphs.canvas = document.querySelector('#glyphsCanvas');
-  state.sdf.canvas = document.querySelector('#sdfCanvas');
   state.webgl.canvas = document.querySelector('#webglCanvas');
 };
 
@@ -45,10 +46,6 @@ const initGlyphs = () => {
   // state.glyphs.ctx.font = 'bold 100px Arial';
   state.glyphs.ctx.font = '30px Arial';
   state.glyphs.ctx.textAlign = 'center';
-};
-
-const initSdf = () => {
-  state.sdf.ctx = state.sdf.canvas.getContext('2d');
 };
 
 const initWebgl = () => {
@@ -61,7 +58,6 @@ const initWebgl = () => {
 const init = () => {
   initDom();
   initGlyphs();
-  initSdf();
   initWebgl();
 };
 
@@ -80,7 +76,7 @@ const update = (value) => {
   // Generate sdf
   const sdfDataOutside = new Float32Array(glyphsArea);
   const sdfDataInside = new Float32Array(glyphsArea);
-  for (let i = 0; i < sdfDataOutside.length; i++) {
+  for (let i = 0; i < glyphsArea; i++) {
     const glyphAlpha = glyphImage.data[i * 4 + 3];
     sdfDataOutside[i] = glyphAlpha >= 254 ? 0 : glyphAlpha < 1 ? Inf : (255 - glyphAlpha) / 255;
     sdfDataInside[i] = glyphAlpha >= 254 ? Inf : glyphAlpha < 1 ? 0 : glyphAlpha / 255;
@@ -88,19 +84,12 @@ const update = (value) => {
   edt(sdfDataOutside, glyphsWidth, glyphsHeight);
   edt(sdfDataInside, glyphsWidth, glyphsHeight);
 
-  // copy sdf --> canvas
-  const radius = glyphsWidth / 2;
-  const sdfImage = state.sdf.ctx.createImageData(glyphsWidth, glyphsHeight);
+  // copy sdf --> webgl
   const arrayBufferView = new Float32Array(glyphsArea * 4);
   for (let i = 0; i < glyphsArea; i++) {
     const sd = Math.sqrt(sdfDataOutside[i]) - Math.sqrt(sdfDataInside[i]);
-    for (let j = 0; j < 3; j++) {
-      sdfImage.data[i * 4 + j] = (sd / radius * .5 + .5) * 255;
-    }
-    sdfImage.data[i * 4 + 3] = 255;
     arrayBufferView[i * 4] = sd;
   }
-  state.sdf.ctx.putImageData(sdfImage, 0, 0);
 
   const gl = state.webgl.ctx;
   updateTexture(gl, arrayBufferView);
