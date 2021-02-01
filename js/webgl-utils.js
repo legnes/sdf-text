@@ -132,8 +132,12 @@ export const createStaticScene = (gl) => {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
   // setup
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  resize(gl);
 }
+
+export const resize = (gl) => {
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+};
 
 export const updateTexture = (gl, textureSource, width, height, isWebgl2) => {
   // gl.activeTexture(gl.TEXTURE0); // in case we want more textures later

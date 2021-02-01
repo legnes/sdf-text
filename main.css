@@ -1,0 +1,44 @@
+.workspace {
+  display: flex;
+  flex-direction: row;
+  width: fit-content;
+}
+
+.workspace div {
+  margin-right: 1rem;
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  width: 18rem;
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.input-section-header {
+  font-weight: bold;
+}
+
+label {
+  margin-top: 0.25rem;
+}
+
+#glyphsCanvas {
+  width: 16rem;
+  height: 16rem;
+}
+
+.editor {
+  width: 33rem;
+  height: 30rem;
+}
+
+.hidden {
+  overflow: hidden;
+  width: 0;
+}

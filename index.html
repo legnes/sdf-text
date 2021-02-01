@@ -1,57 +1,107 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>SDF Text</title>
+  <link rel="shortcut icon" type="image/png" href="./img/fav.png"/>
+  <link rel="stylesheet" href="main.css">
+</head>
 <body>
-
-  <div>
-    <input id="textInput" type="text" value="egg" />
-    <select id="fontStyleSelect">
-      <option value="normal">normal</option>
-      <option value="italic">italic</option>
-      <option value="oblique">oblique</option>
-    </select>
-    <select id="fontVariantSelect">
-      <option value="normal">normal</option>
-      <option value="small-caps">small-caps</option>
-    </select>
-    <select id="fontWeightSelect">
-      <option value="normal">normal</option>
-      <option value="bold">bold</option>
-      <option value="bolder">bolder</option>
-      <option value="lighter">lighter</option>
-    </select>
-    <input id="fontSizeInput" type="number" min="1" max="2048"/>
-    <select id="fontFamilySelect">
-      <option value="Arial">Arial</option>
-      <option value="Verdana">Verdana</option>
-      <option value="Helvetica">Helvetica</option>
-      <option value="Tahoma">Tahoma</option>
-      <option value="Trebuchet MS">Trebuchet MS</option>
-      <option value="Times New Roman">Times New Roman</option>
-      <option value="Georgia">Georgia</option>
-      <option value="Garamond">Garamond</option>
-      <option value="Courier New">Courier New</option>
-      <option value="Brush Script MT">Brush Script MT</option>
-      <option value="initial">initial</option>
-    </select>
-  <div>
-    <select id="distanceTransformSelect"></select>
-    <select id="sdfResolution">
-      <option value="64">64</option>
-      <option value="128">128</option>
-      <option value="256" selected>256</option>
-      <option value="512">512</option>
-      <option value="1024">1024</option>
-    </select>
-  </div>
-  <div>
-    <div>
-      <select id="shaderPresetSelect"></select>
+  <div class="workspace">
+    <div class="inputs">
+      <div class="input-section">
+        <span class="input-section-header">input</span>
+        <input id="textInput" type="text"/>
+      </div>
+      <div class="input-section">
+        <span class="input-section-header">font settings</span>
+        <label>
+          style
+          <select id="fontStyleSelect">
+            <option value="normal">normal</option>
+            <option value="italic">italic</option>
+            <option value="oblique">oblique</option>
+          </select>
+        </label>
+        <label>
+          variant
+          <select id="fontVariantSelect">
+            <option value="normal">normal</option>
+            <option value="small-caps">small-caps</option>
+          </select>
+        </label>
+        <label>
+          weight
+          <select id="fontWeightSelect">
+            <option value="normal">normal</option>
+            <option value="bold">bold</option>
+            <option value="bolder">bolder</option>
+            <option value="lighter">lighter</option>
+          </select>
+        </label>
+        <label>
+          size
+          <input id="fontSizeInput" type="number" min="1" max="2048"/>
+        </label>
+        <label>
+          family
+          <select id="fontFamilySelect">
+            <option value="Arial">Arial</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Garamond">Garamond</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Brush Script MT">Brush Script MT</option>
+            <option value="initial">initial</option>
+          </select>
+        </label>
+      </div>
+      <div class="input-section">
+        <span class="input-section-header">render settings</span>
+        <label>
+          sdf quality (texture resolution)
+          <select id="sdfResolution">
+            <option value="64">64</option>
+            <option value="128">128</option>
+            <option value="256" selected>256</option>
+            <option value="512">512</option>
+            <option value="1024">1024</option>
+          </select>
+        </label>
+        <label>
+          output size
+          <select id="webglResolution">
+            <option value="256">256</option>
+            <option value="512">512</option>
+            <option value="1024" selected>1024</option>
+          </select>
+        </label>
+        <label>
+          distance transform
+          <select id="distanceTransformSelect"></select>
+        </label>
+        <label>
+          shader preset
+          <select id="shaderPresetSelect"></select>
+        </label>
+        <label>
+          show live shader editor
+          <input id="showEditorInput" type="checkbox"></input>
+        </label>
+      </div>
+      <canvas id="glyphsCanvas" width="256" height="256"></canvas>
     </div>
-    <textarea id="shaderEditor"></textarea>
-    <div id="shaderOutput"></div>
+    <div id="editorContainer" class="hidden">
+      <textarea id="shaderEditor" class="editor"></textarea>
+      <div id="shaderOutput"></div>
+    </div>
+    <div class="outputs">
+      <canvas id="webglCanvas" width="1024" height="1024"></canvas>
+    </div>
   </div>
-  <canvas id="webglCanvas" width="1024" height="1024"></canvas>
-  <canvas id="glyphsCanvas" width="256" height="256"></canvas>
   <script src="./js/main.js" type="module"></script>
 </body>
 </html>

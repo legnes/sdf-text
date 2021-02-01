@@ -1,4 +1,4 @@
-import { createContext, createStaticScene, createOrUpdatePipeline, updateTexture, render } from './webgl-utils.js';
+import { createContext, createStaticScene, createOrUpdatePipeline, updateTexture, render, resize } from './webgl-utils.js';
 import { populateOptions, bindStateListener } from './dom-utils.js';
 import distanceTransforms from './distance-transforms.js';
 import shaders from '../shaders/index.js';
@@ -24,7 +24,7 @@ import shaders from '../shaders/index.js';
 
 const state = {
   input: {
-    text: '',
+    text: 'egg',
     font: {
       style: 'normal',
       variant: 'normal',
@@ -86,6 +86,14 @@ const initDom = () => {
     updateFontAndRenderFull();
   });
 
+  document.querySelector('#webglResolution').addEventListener('change', (evt) => {
+    const resolution = parseInt(evt.target.value);
+    state.webgl.canvas.width = resolution;
+    state.webgl.canvas.height = resolution;
+    resize(state.webgl.ctx);
+    renderWebgl();
+  });
+
   populateOptions('#shaderPresetSelect', shaders.frag, state.input.shader.name);
   bindStateListener('#shaderPresetSelect', 'change', 'input.shader.name', () => {
     loadShader();
@@ -98,6 +106,11 @@ const initDom = () => {
     renderWebgl();
   });
   state.input.shader.output = document.querySelector('#shaderOutput');
+
+  const editorContainer = document.querySelector('#editorContainer');
+  document.querySelector('#showEditorInput').addEventListener('input', (evt) => {
+    editorContainer.className = evt.target.checked ? '' : 'hidden';
+  });
 };
 
 const initGlyphs = () => {
@@ -203,3 +216,4 @@ const renderFull = () => {
 };
 
 init();
+renderFull();
