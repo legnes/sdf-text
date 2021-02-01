@@ -15,7 +15,7 @@ import shaders from '../shaders/index.js';
 //      [X] raw
 //      [X] outline
 //      [X] wordart
-//      [ ] concentric
+//      [X] concentric
 //      [ ] thinner/skeleton
 //      [ ] extrusion vanishing point
 //      [ ] 
