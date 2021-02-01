@@ -24,7 +24,7 @@ import shaders from '../shaders/index.js';
 
 const state = {
   input: {
-    text: 'egg',
+    text: 'type',
     font: {
       style: 'normal',
       variant: 'normal',
