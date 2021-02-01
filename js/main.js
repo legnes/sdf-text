@@ -1,28 +1,46 @@
-import { createContext, createStaticScene, createPipeline, updateTexture, render } from './webgl-utils.js';
+import { createContext, createStaticScene, createOrUpdatePipeline, updateTexture, render } from './webgl-utils.js';
+import { populateOptions, bindStateListener } from './dom-utils.js';
+import distanceTransforms from './distance-transforms.js';
 import shaders from '../shaders/index.js';
 
-// https://github.com/mapbox/tiny-sdf/blob/master/index.js
-// http://cs.brown.edu/people/pfelzens/papers/dt-final.pdf
-// https://github.com/Lisapple/8SSEDT
-
-// PLAN
-// [ ] Text area
-// [ ] Font inputs
-// [ ] Editable shaders
-// [ ] More shader variables
+// To Do
+// [ ] Input text: Text area
+// [X] Font inputs
+// [X] Editable shaders
+// [X] More shader variables
 //      [ ] time
-//      [ ] tex res
-//      [ ] out res
-// [ ] Different shader styles
-//      [ ] raw
-//      [ ] outline
-//      [ ] wordart
+//      [X] tex res
+//      [X] out res
+// [X] Different shader styles
+//      [X] raw
+//      [X] outline
+//      [X] wordart
+//      [ ] concentric
+//      [ ] thinner/skeleton
+//      [ ] extrusion vanishing point
+//      [ ] 
 // [X] Dynamic resolution (bypass sdf canvas)
-// [ ] Quality slider (text canvas resolution)
-const Inf = 1e20;
+// [X] Quality slider (text canvas resolution)
 
 const state = {
-  text: '',
+  input: {
+    text: '',
+    font: {
+      style: 'normal',
+      variant: 'normal',
+      weight: 'normal',
+      size: 400,
+      family: 'Garamond'
+    },
+    distanceTransform: {
+      name: 'euclidean'
+    },
+    shader: {
+      name: 'outline',
+      editor: null,
+      output: null
+    }
+  },
   glyphs: {
     canvas: null,
     ctx: null,
@@ -31,35 +49,61 @@ const state = {
     canvas: null,
     ctx: null,
     isWebgl2: false,
-    pipeline: {}
+    pipeline: {},
+    uniforms: [
+      {
+        name: 'uSdfResolution',
+        values: [-1, -1]
+      },
+      {
+        name: 'uOutputResolution',
+        values: [-1, -1]
+      }
+    ]
   },
 };
 
 const initDom = () => {
-  document.querySelector('#textInput').addEventListener('input', (evt) => update(evt.target.value));
-  
-  const shaderPresetSelect = document.querySelector('#shaderPresetSelect');
-  for (const shaderName in shaders.frag) {
-    const shaderPresetOption = document.createElement('option');
-    shaderPresetOption.text = shaderName;
-    shaderPresetSelect.add(shaderPresetOption);
-  }
-  shaderPresetSelect.addEventListener('change', (evt) => {
-    const shader = shaders.frag[evt.target.value];
-    createPipeline(state.webgl.ctx, shader, state.webgl.pipeline);
-    _render();
-  });
-
   state.glyphs.canvas = document.querySelector('#glyphsCanvas');
   state.webgl.canvas = document.querySelector('#webglCanvas');
+
+  bindStateListener('#textInput', 'input', 'input.text', renderFull, state);
+  bindStateListener('#fontStyleSelect', 'change', 'input.font.style', updateFontAndRenderFull, state);
+  bindStateListener('#fontVariantSelect', 'change', 'input.font.variant', updateFontAndRenderFull, state);
+  bindStateListener('#fontWeightSelect', 'change', 'input.font.weight', updateFontAndRenderFull, state);
+  bindStateListener('#fontSizeInput', 'input', 'input.font.size', updateFontAndRenderFull, state);
+  bindStateListener('#fontFamilySelect', 'change', 'input.font.family', updateFontAndRenderFull, state);
+
+  populateOptions('#distanceTransformSelect', distanceTransforms, state.input.distanceTransform.name);
+  bindStateListener('#distanceTransformSelect', 'change', 'input.distanceTransform.name', renderFull, state);
+
+  document.querySelector('#sdfResolution').addEventListener('change', (evt) => {
+    const resolution = parseInt(evt.target.value);
+    state.glyphs.canvas.width = resolution;
+    state.glyphs.canvas.height = resolution;
+    // seems like we have to reset this
+    state.glyphs.ctx.textAlign = 'center';
+    updateFontAndRenderFull();
+  });
+
+  populateOptions('#shaderPresetSelect', shaders.frag, state.input.shader.name);
+  bindStateListener('#shaderPresetSelect', 'change', 'input.shader.name', () => {
+    loadShader();
+    renderWebgl();
+  }, state);
+
+  state.input.shader.editor = document.querySelector('#shaderEditor');
+  state.input.shader.editor.addEventListener('input', (evt) => {
+    updateShader();
+    renderWebgl();
+  });
+  state.input.shader.output = document.querySelector('#shaderOutput');
 };
 
 const initGlyphs = () => {
-  // TODO: add inputs for font styles
   state.glyphs.ctx = state.glyphs.canvas.getContext('2d');
-  state.glyphs.ctx.font = 'bold 100px Arial';
-  // state.glyphs.ctx.font = '30px Arial';
   state.glyphs.ctx.textAlign = 'center';
+  updateFont();
 };
 
 const initWebgl = () => {
@@ -67,8 +111,8 @@ const initWebgl = () => {
   state.webgl.ctx = context.ctx;
   state.webgl.isWebgl2 = context.isWebgl2;
   createStaticScene(state.webgl.ctx);
-  createPipeline(state.webgl.ctx, shaders.frag.extrude, state.webgl.pipeline);
-}
+  loadShader();
+};
 
 const init = () => {
   initDom();
@@ -76,97 +120,86 @@ const init = () => {
   initWebgl();
 };
 
-const update = (value) => {
-  state.text = value;
+const updateFont = () => {
+  let { style, variant, weight, size, family } = state.input.font;
+  size *= state.glyphs.canvas.width / state.webgl.canvas.width; 
+  state.glyphs.ctx.font = `${style} ${variant} ${weight} ${size}px ${family}`;
+};
 
+const updateFontAndRenderFull = () => {
+  updateFont();
+  renderFull();
+};
+
+const loadShader = () => {
+  const source = shaders.frag[state.input.shader.name];
+  state.input.shader.editor.value = source;
+  updateShader();
+};
+
+const updateShader = () => {
+  const source = state.input.shader.editor.value;
+  createOrUpdatePipeline(state.webgl.ctx, source, state.webgl.pipeline);
+  state.input.shader.output.innerHTML = state.webgl.pipeline.error;
+};
+
+// https://github.com/mapbox/tiny-sdf/blob/master/index.js
+// http://cs.brown.edu/people/pfelzens/papers/dt-final.pdf
+// https://github.com/Lisapple/8SSEDT
+const Inf = 1e20;
+let sdfDataOutside, sdfDataInside, texture;
+const renderSdf = () => {
   const glyphsWidth = state.glyphs.canvas.width;
   const glyphsHeight = state.glyphs.canvas.height;
   const glyphsArea = glyphsWidth * glyphsHeight;
 
-  state.glyphs.ctx.clearRect(0, 0, glyphsWidth, glyphsHeight);
-  state.glyphs.ctx.fillText(value, glyphsWidth / 2, glyphsHeight / 2);
+  // Lazily manage resources
+  if (!sdfDataOutside || !sdfDataInside || sdfDataOutside.length < glyphsArea || sdfDataInside.length < glyphsArea) {
+    sdfDataOutside = new Float32Array(glyphsArea);
+    sdfDataInside = new Float32Array(glyphsArea);
+  }
+  if (!texture || texture.length < glyphsArea * 4) {
+    texture = new Float32Array(glyphsArea * 4);
+  }
 
+  // Draw text to canvas and caputre
+  state.glyphs.ctx.clearRect(0, 0, glyphsWidth, glyphsHeight);
+  state.glyphs.ctx.fillText(state.input.text, glyphsWidth / 2, glyphsHeight / 2);
   const glyphImage = state.glyphs.ctx.getImageData(0, 0, glyphsWidth, glyphsHeight);
   
-  // Generate sdf
-  const sdfDataOutside = new Float32Array(glyphsArea);
-  const sdfDataInside = new Float32Array(glyphsArea);
+  // Generate sdf using a distance transform func to generate two unsigned distance fields
+  // (one to outside of glpyh, one to inside of glyph), and then subtract to get signed distance
   for (let i = 0; i < glyphsArea; i++) {
     const glyphAlpha = glyphImage.data[i * 4 + 3];
     sdfDataOutside[i] = glyphAlpha >= 254 ? 0 : glyphAlpha < 1 ? Inf : (255 - glyphAlpha) / 255;
     sdfDataInside[i] = glyphAlpha >= 254 ? Inf : glyphAlpha < 1 ? 0 : glyphAlpha / 255;
   }
-  edt(sdfDataOutside, glyphsWidth, glyphsHeight);
-  edt(sdfDataInside, glyphsWidth, glyphsHeight);
+  const distanceTransform = distanceTransforms[state.input.distanceTransform.name];
+  distanceTransform(sdfDataOutside, glyphsWidth, glyphsHeight);
+  distanceTransform(sdfDataInside, glyphsWidth, glyphsHeight);
 
-  // copy sdf --> webgl
-  const arrayBufferView = new Float32Array(glyphsArea * 4);
+  // Send sdf up to webgl
   for (let i = 0; i < glyphsArea; i++) {
-    const sd = Math.sqrt(sdfDataOutside[i]) - Math.sqrt(sdfDataInside[i]);
-    arrayBufferView[i * 4] = sd;
+    const sd = sdfDataOutside[i] - sdfDataInside[i];
+    texture[i * 4] = sd;
   }
+  updateTexture(state.webgl.ctx, texture, glyphsWidth, glyphsHeight, state.webgl.isWebgl2);
+};
+
+const renderWebgl = () => {
+  const uniforms = state.webgl.uniforms;
+  uniforms[0].values[0] = state.glyphs.canvas.width;
+  uniforms[0].values[1] = state.glyphs.canvas.height;
+  uniforms[1].values[0] = state.webgl.canvas.width;
+  uniforms[1].values[1] = state.webgl.canvas.height;
 
   const gl = state.webgl.ctx;
-  updateTexture(gl, arrayBufferView, state.webgl.isWebgl2);
-  
-  _render();
+  render(gl, state.webgl.pipeline, uniforms);
 };
 
-const _render = () => {
-  const gl = state.webgl.ctx;
-  render(gl, state.webgl.pipeline, [
-    {
-      name: 'uSdfResolution',
-      values: [state.glyphs.canvas.width, state.glyphs.canvas.height]
-    },
-    {
-      name: 'uOutputResolution',
-      values: [state.webgl.canvas.width, state.webgl.canvas.height]
-    }
-  ]);
-};
-
-const edt = (data, width, height) => {
-  for (let y = 0; y < height; y++) {
-    edt1d(data, y * width, 1, width);
-  }
-  for (let x = 0; x < width; x++) {
-    edt1d(data, x, width, height);
-  }
-};
-
-const edt1d = (data, offset, stride, length) => {
-  // copy row/col
-  const f = [];
-  for (let q = 0; q < length; q++) {
-    f[q] = data[offset + q * stride];
-  }
-
-  // begin alg
-  let k = 0;
-  const v = [0];
-  const z = [-Infinity, Infinity];
-
-  for (let q = 1; q < length; q++) {
-    let s;
-    do {
-      const r = v[k];
-      s = (f[q] - f[r] + q * q - r * r) / (q - r) / 2;
-    } while (s <= z[k] && --k > -1)
-
-    k++;
-    v[k] = q;
-    z[k] = s;
-    z[k + 1] = Infinity;
-  }
-
-  k = 0;
-  for (let q = 0; q < length; q++) {
-    while (z[k + 1] < q) {
-      k++;
-    }
-    data[offset + q * stride] = (q - v[k]) * (q - v[k]) + f[v[k]];
-  }
+const renderFull = () => {
+  renderSdf();
+  renderWebgl();
 };
 
 init();

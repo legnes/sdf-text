@@ -27,13 +27,24 @@ const createShader = (gl, type, source) => {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
+  return shader;
+};
+
+const validateShader = (gl, shader) => {
   const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-  if (success) {
-    return shader;
+  if (!success) {
+    const error = gl.getShaderInfoLog(shader);
+    gl.deleteShader(shader);
+    return error;
   }
- 
-  console.log(gl.getShaderInfoLog(shader));
-  gl.deleteShader(shader);
+  return null;
+};
+
+const createAndValidateShader = (gl, type, source) => {
+  const shader = createShader(gl, type, source);
+  const error = validateShader(gl, shader);
+  if (error) console.log(error);
+  return error ? null : shader;
 };
 
 const createProgram = (gl, vertShader, fragShader) => {
@@ -50,18 +61,41 @@ const createProgram = (gl, vertShader, fragShader) => {
   gl.deleteProgram(program);
 };
 
-export const createPipeline = (gl, fragSource, pipeline) => {
+const clearPipeline = (gl, pipeline) => {
   if (pipeline.program) {
     gl.deleteProgram(pipeline.program);
+    pipeline.program = null;
   }
+
   if (pipeline.fragShader) {
     gl.deleteShader(pipeline.fragShader);
+    pipeline.fragShader = null;
   }
-  pipeline.uniformLocations = null;
 
-  const vertShader = pipeline.vertShader || createShader(gl, gl.VERTEX_SHADER, shaders.vert.simplePosition);
+  pipeline.uniformLocations = null;
+  pipeline.error = null;
+};
+
+export const createOrUpdatePipeline = (gl, fragSource, pipeline) => {
+  clearPipeline(gl, pipeline);
+
+  const vertShader = pipeline.vertShader || createAndValidateShader(gl, gl.VERTEX_SHADER, shaders.vert.simplePosition);
+  pipeline.vertShader = vertShader;
+
   const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragSource);
+  const fragError = validateShader(gl, fragShader);
+  if (fragError) {
+    pipeline.error = fragError;
+    return pipeline;
+  }
+  pipeline.fragShader = fragShader;
+
   const program = createProgram(gl, vertShader, fragShader);
+  pipeline.program = program;
+  if (!program) {
+    return pipeline;
+  }
+
   const positionAttributeLocation = gl.getAttribLocation(program, 'aPosition');
   const textureUniformLocation = gl.getUniformLocation(program, 'uSdf');
   
@@ -70,8 +104,6 @@ export const createPipeline = (gl, fragSource, pipeline) => {
   gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
   gl.uniform1i(textureUniformLocation, 0);
 
-  pipeline.fragShader = fragShader;
-  pipeline.program = program;
   return pipeline;
 };
 
@@ -103,22 +135,23 @@ export const createStaticScene = (gl) => {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 }
 
-export const updateTexture = (gl, textureSource, isWebgl2) => {
+export const updateTexture = (gl, textureSource, width, height, isWebgl2) => {
   // gl.activeTexture(gl.TEXTURE0); // in case we want more textures later
 
   // from canvas
   // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.FLOAT, textureSource, 0);
 
   // from array buffer view
-  const dimension = Math.sqrt(textureSource.length / 4);
   if (isWebgl2) {
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, dimension, dimension, 0, gl.RGBA, gl.FLOAT, textureSource, 0);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, textureSource, 0);
   } else {
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, dimension, dimension, 0, gl.RGBA, gl.FLOAT, textureSource, 0);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.FLOAT, textureSource, 0);
   }
 };
 
 export const render = (gl, pipeline, uniforms) => {
+  if (pipeline.error) return;
+
   // TODO: add safety/checking?
   const uniformLocations = pipeline.uniformLocations || uniforms.map((uniform) => gl.getUniformLocation(pipeline.program, uniform.name));
   pipeline.uniformLocations = uniformLocations;
