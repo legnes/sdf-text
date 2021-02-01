@@ -13,13 +13,45 @@
         <input id="textInput" type="text"/>
       </div>
       <div class="input-section">
+        <span class="input-section-header">render settings</span>
+        <label>
+          show live shader editor
+          <input id="showEditorInput" type="checkbox"></input>
+        </label>
+        <label>
+          shader preset
+          <select id="shaderPresetSelect"></select>
+        </label>
+        <label>
+          distance transform
+          <select id="distanceTransformSelect"></select>
+        </label>
+        <label>
+          sdf quality (texture resolution)
+          <select id="sdfResolution">
+            <option value="64">64</option>
+            <option value="128">128</option>
+            <option value="256" selected>256</option>
+            <option value="512">512</option>
+            <option value="1024">1024</option>
+          </select>
+        </label>
+        <label>
+          output size
+          <select id="webglResolution">
+            <option value="256">256</option>
+            <option value="512">512</option>
+            <option value="1024" selected>1024</option>
+          </select>
+        </label>
+      </div>
+      <div class="input-section">
         <span class="input-section-header">font settings</span>
         <label>
           style
           <select id="fontStyleSelect">
             <option value="normal">normal</option>
             <option value="italic">italic</option>
-            <option value="oblique">oblique</option>
           </select>
         </label>
         <label>
@@ -57,39 +89,6 @@
             <option value="Brush Script MT">Brush Script MT</option>
             <option value="initial">initial</option>
           </select>
-        </label>
-      </div>
-      <div class="input-section">
-        <span class="input-section-header">render settings</span>
-        <label>
-          sdf quality (texture resolution)
-          <select id="sdfResolution">
-            <option value="64">64</option>
-            <option value="128">128</option>
-            <option value="256" selected>256</option>
-            <option value="512">512</option>
-            <option value="1024">1024</option>
-          </select>
-        </label>
-        <label>
-          output size
-          <select id="webglResolution">
-            <option value="256">256</option>
-            <option value="512">512</option>
-            <option value="1024" selected>1024</option>
-          </select>
-        </label>
-        <label>
-          distance transform
-          <select id="distanceTransformSelect"></select>
-        </label>
-        <label>
-          shader preset
-          <select id="shaderPresetSelect"></select>
-        </label>
-        <label>
-          show live shader editor
-          <input id="showEditorInput" type="checkbox"></input>
         </label>
       </div>
       <canvas id="glyphsCanvas" width="256" height="256"></canvas>

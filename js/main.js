@@ -4,7 +4,17 @@ import distanceTransforms from './distance-transforms.js';
 import shaders from '../shaders/index.js';
 
 // To Do
-// [ ] Input text: Text area
+// [ ] Clean shaders
+//      [ ] make colors obvious
+//      [ ] move non-text settings up
+// [ ] Improve input
+//      [ ] Auto font size scaling
+//      [ ] Text area
+// [ ] Shader control
+//      [ ] add UI for some new uniforms (color? distance?)
+//      [ ] auto detect uniforms and add to UI?
+// [ ] Improve editor
+//      [ ] syntax highlighting
 // [X] Font inputs
 // [X] Editable shaders
 // [X] More shader variables
@@ -16,6 +26,8 @@ import shaders from '../shaders/index.js';
 //      [X] outline
 //      [X] wordart
 //      [X] concentric
+//      [ ] text gradient
+//      [ ] text pattern/image mask
 //      [ ] thinner/skeleton
 //      [ ] extrusion vanishing point
 //      [ ] 
