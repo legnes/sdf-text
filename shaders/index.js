@@ -11,7 +11,7 @@ const shaders = {
     simplePosition: simplePositionVert,
   },
   frag: {
-    debug: debugFrag,
+    // debug: debugFrag,
     raw: rawFrag,
     outline: outlineFrag,
     dropShadow: dropShadowFrag,
