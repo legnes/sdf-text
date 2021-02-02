@@ -10,33 +10,27 @@ html, body {
   height: 100%;
 }
 
-.workspace div {
-  margin-right: 1rem;
-}
-
 .inputs {
   display: flex;
   flex-direction: column;
   width: 18rem;
+  margin-right: 1rem;
   padding: 1rem;
 }
 
 .input-section {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .input-section-header {
+  margin-bottom: 0.25rem;
   font-weight: bold;
 }
 
-.outputs {
-  height: 100%;
-}
-
 label {
-  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 #glyphsCanvas {
@@ -46,13 +40,15 @@ label {
 }
 
 #webglCanvas {
-  height: calc(100% - 4px);
+  height: calc(100% - 2rem);
   border: 1px solid black;
+  margin-top: 1rem;
 }
 
 .editor {
   width: 33rem;
-  height: 30rem;
+  height: 80%;
+  margin: 1rem 1rem 0 0;
 }
 
 .hidden {

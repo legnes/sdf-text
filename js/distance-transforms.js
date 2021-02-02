@@ -10,12 +10,12 @@ const squaredEuclideanDistanceTransform1d = (data, offset, stride, length) => {
 
   // begin alg
   let k = 0;          // Index of rightmost parabola in lower envelope
-  v[0] = 0;           // Locations of parabolas in lower envelope 
+  v[0] = 0;           // Locations of parabolas in lower envelope
   z[0] = -Infinity;   // Locations of boundaries between parabolas
   z[1] = Infinity;
 
   // Compute lower envelope
-  for (let q = 1; q < length; q++) { 
+  for (let q = 1; q < length; q++) {
     let s = -Infinity;
     k++;
     while (s <= z[k]) {
@@ -32,7 +32,7 @@ const squaredEuclideanDistanceTransform1d = (data, offset, stride, length) => {
 
   // Fill in values of distance transform
   k = 0;
-  for (let q = 0; q < length; q++) { 
+  for (let q = 0; q < length; q++) {
     while (z[k + 1] < q) {
       k++;
     }

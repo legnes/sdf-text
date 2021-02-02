@@ -4,9 +4,6 @@ import distanceTransforms from './distance-transforms.js';
 import shaders from '../shaders/index.js';
 
 // To Do
-// [ ] Clean shaders
-//      [ ] make colors obvious
-//      [ ] move non-text settings up
 // [ ] Improve input
 //      [ ] Auto font size scaling
 //      [ ] Text area
@@ -30,7 +27,7 @@ import shaders from '../shaders/index.js';
 //      [ ] text pattern/image mask
 //      [ ] thinner/skeleton
 //      [ ] extrusion vanishing point
-//      [ ] 
+//      [ ]
 // [X] Dynamic resolution (bypass sdf canvas)
 // [X] Quality slider (text canvas resolution)
 
@@ -147,7 +144,7 @@ const init = () => {
 
 const updateFont = () => {
   let { style, variant, weight, size, family } = state.input.font;
-  size *= state.glyphs.canvas.width / state.webgl.canvas.width; 
+  size *= state.glyphs.canvas.width / state.webgl.canvas.width;
   state.glyphs.ctx.font = `${style} ${variant} ${weight} ${size}px ${family}`;
 };
 
@@ -191,7 +188,7 @@ const renderSdf = () => {
   state.glyphs.ctx.clearRect(0, 0, glyphsWidth, glyphsHeight);
   state.glyphs.ctx.fillText(state.input.text, glyphsWidth / 2, glyphsHeight / 2);
   const glyphImage = state.glyphs.ctx.getImageData(0, 0, glyphsWidth, glyphsHeight);
-  
+
   // Generate sdf using a distance transform func to generate two unsigned distance fields
   // (one to outside of glpyh, one to inside of glyph), and then subtract to get signed distance
   for (let i = 0; i < glyphsArea; i++) {

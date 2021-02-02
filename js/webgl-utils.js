@@ -13,7 +13,7 @@ export const createContext = (canvas) => {
   } else {
     throw new Error('Could not find webgl!');
   }
-  
+
   if (!gl.getExtension('OES_texture_float_linear')) {
     throw new Error('Could not find linear float texture filtering!');
   }
@@ -56,7 +56,7 @@ const createProgram = (gl, vertShader, fragShader) => {
   if (success) {
     return program;
   }
- 
+
   console.log(gl.getProgramInfoLog(program));
   gl.deleteProgram(program);
 };
@@ -98,7 +98,7 @@ export const createOrUpdatePipeline = (gl, fragSource, pipeline) => {
 
   const positionAttributeLocation = gl.getAttribLocation(program, 'aPosition');
   const textureUniformLocation = gl.getUniformLocation(program, 'uSdf');
-  
+
   gl.useProgram(program);
   gl.enableVertexAttribArray(positionAttributeLocation);
   gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
