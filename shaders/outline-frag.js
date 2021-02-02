@@ -7,6 +7,7 @@ precision mediump float;
 // distances and fuzziness are in pixels
 // (of inherent resolution)
 ////////////////////////////////
+const vec4 BACKGROUND_COLOR = vec4(1, 1, 1, 0);
 const vec4 TEXT_COLOR = vec4(1, 0, 1, 1);
 const vec4 OUTLINE_COLOR = vec4(0, 1, 1, 1);
 const int OUTLINE_START = 88;
@@ -31,7 +32,11 @@ void main() {
   float isOutline = smoothstep(-outlineFalloff, 0., distancePx - float(OUTLINE_START)) *
                     smoothstep(outlineFalloff, 0., distancePx - float(OUTLINE_END));
 
-  gl_FragColor = isText * TEXT_COLOR + isOutline * OUTLINE_COLOR;
+  float isBackground = (1. - isText) * (1. - isOutline);
+
+  gl_FragColor = isText * TEXT_COLOR +
+                 isOutline * OUTLINE_COLOR +
+                 isBackground * BACKGROUND_COLOR;
 }
 
 `;

@@ -7,7 +7,8 @@ precision mediump float;
 // distances and fuzziness are in pixels
 // (of inherent resolution)
 ////////////////////////////////
-const vec4 COLOR = vec4(1, 0, 1, 1);
+const vec4 BACKGROUND_COLOR = vec4(0, 0, 0, 1);
+const vec4 TEXT_COLOR = vec4(1, 0, 1, 1);
 const int EXTRA_WIDTH = -0;
 const int FUZZINESS = 2;
 ////////////////////////////////
@@ -24,7 +25,7 @@ void main() {
 
   float isText = smoothstep(float(FUZZINESS), 0., distancePx - float(EXTRA_WIDTH));
 
-  gl_FragColor = isText * COLOR;
+  gl_FragColor = mix(BACKGROUND_COLOR, TEXT_COLOR, isText);
 }
 
 `;
