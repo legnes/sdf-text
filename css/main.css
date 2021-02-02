@@ -21,7 +21,7 @@ html, body {
 .input-section {
   display: flex;
   flex-direction: column;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .input-section-header {
@@ -30,7 +30,7 @@ html, body {
 }
 
 #textInput {
-  height: 10rem;
+  height: 8rem;
 }
 
 label {

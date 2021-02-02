@@ -4,20 +4,9 @@ import distanceTransforms from './distance-transforms.js';
 import shaders from '../shaders/index.js';
 
 // To Do
-// [ ] Improve input
-//      [ ] Auto font size scaling
-//      [ ] Text area
 // [ ] Shader control
-//      [ ] add UI for some new uniforms (color? distance?)
+//      [ ] add UI for some uniforms (color? distance?)
 //      [ ] auto detect uniforms and add to UI?
-// [ ] Improve editor
-//      [ ] syntax highlighting
-// [] Different shader styles
-//      [ ] text gradient
-//      [ ] text pattern/image mask
-//      [ ] thinner/skeleton
-//      [ ] extrusion vanishing point
-//      [ ]
 
 const state = {
   input: {

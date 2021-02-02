@@ -1,22 +1,28 @@
-import simplePositionVert from './simple-position-vert.js';
-import debugFrag from './debug-frag.js';
-import rawFrag from './raw-frag.js';
-import outlineFrag from './outline-frag.js';
-import dropShadowFrag from './drop-shadow-frag.js';
-import extrudeFrag from './extrude-frag.js';
-import concentricFrag from './concentric-frag.js';
+import simplePosition from './simple-position-vert.js';
+import debug from './debug-frag.js';
+import raw from './raw-frag.js';
+import outline from './outline-frag.js';
+import dropShadow from './drop-shadow-frag.js';
+import extrude from './extrude-frag.js';
+import concentric from './concentric-frag.js';
+import simpleText from './simple-text-frag.js';
+import gradient from './gradient-frag.js';
+import patternMask from './pattern-mask-frag.js';
 
 const shaders = {
   vert: {
-    simplePosition: simplePositionVert,
+    simplePosition,
   },
   frag: {
-    // debug: debugFrag,
-    raw: rawFrag,
-    outline: outlineFrag,
-    dropShadow: dropShadowFrag,
-    extrude: extrudeFrag,
-    concentric: concentricFrag,
+    // debug: debug,
+    raw,
+    simpleText,
+    gradient,
+    patternMask,
+    outline,
+    dropShadow,
+    extrude,
+    concentric,
   },
 };
 

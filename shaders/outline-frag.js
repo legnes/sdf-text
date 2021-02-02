@@ -9,8 +9,8 @@ precision mediump float;
 ////////////////////////////////
 const vec4 TEXT_COLOR = vec4(1, 0, 1, 1);
 const vec4 OUTLINE_COLOR = vec4(0, 1, 1, 1);
-const int OUTLINE_START = 60;
-const int OUTLINE_END = 70;
+const int OUTLINE_START = 88;
+const int OUTLINE_END = 98;
 const int OUTLINE_FUZZINESS = 5;
 const int TEXT_FUZZINESS = 2;
 ////////////////////////////////
@@ -25,14 +25,11 @@ void main() {
   float distanceUV = texture2D(uSdf, vUV).r / uSdfResolution.x;
   float distancePx = distanceUV * uOutputResolution.x;
 
-  float outlineStart = float(OUTLINE_START);
-  float outlineEnd = float(OUTLINE_END);
-  float textFalloff = float(TEXT_FUZZINESS);
-  float outlineFalloff = float(OUTLINE_FUZZINESS);
+  float isText = smoothstep(float(TEXT_FUZZINESS), 0., distancePx);
 
-  float isText = smoothstep(textFalloff, 0., distancePx);
-  float isOutline = smoothstep(-outlineFalloff, 0., distancePx - outlineStart) *
-                    smoothstep(outlineFalloff, 0., distancePx - outlineEnd);
+  float outlineFalloff = float(OUTLINE_FUZZINESS);
+  float isOutline = smoothstep(-outlineFalloff, 0., distancePx - float(OUTLINE_START)) *
+                    smoothstep(outlineFalloff, 0., distancePx - float(OUTLINE_END));
 
   gl_FragColor = isText * TEXT_COLOR + isOutline * OUTLINE_COLOR;
 }

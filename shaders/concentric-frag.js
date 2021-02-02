@@ -28,21 +28,18 @@ void main() {
   float distanceUV = texture2D(uSdf, vUV).r / uSdfResolution.x;
   float distancePx = distanceUV * uOutputResolution.x;
 
-  float textFalloff = float(TEXT_FUZZINESS);
+  float isText = smoothstep(float(TEXT_FUZZINESS), 0., distancePx);
+
   float ringPeriod = float(RING_PERIOD);
   float ringRadius = float(RING_WIDTH) / 2.;
   float ringFalloff = float(RING_FUZZINESS);
-  float concentricIndexStart = float(RINGS_START);
-  float concentricIndexEnd = float(RINGS_END);
   float concentricIndexFalloff = float(RINGS_FADE);
-
-  float isText = smoothstep(textFalloff, 0., distancePx);
   float concentricPosition = mod(distancePx, ringPeriod) - ringPeriod * 0.5;
   float concentricIndex = floor(distancePx / ringPeriod);
   float isConcentric = smoothstep(-ringFalloff, 0., concentricPosition + ringRadius) *
                        smoothstep(ringFalloff, 0., concentricPosition - ringRadius);
-  float concentricFade = smoothstep(-concentricIndexFalloff, 0., concentricIndex - concentricIndexStart) *
-                         smoothstep(concentricIndexFalloff, 0., concentricIndex - concentricIndexEnd);
+  float concentricFade = smoothstep(-concentricIndexFalloff, 0., concentricIndex - float(RINGS_START)) *
+                         smoothstep(concentricIndexFalloff, 0., concentricIndex - float(RINGS_END));
   vec4 ringColor = vec4(RING_COLOR.rgb, concentricFade);
   isConcentric *= (1. - isText);
 

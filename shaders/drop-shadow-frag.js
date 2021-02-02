@@ -26,15 +26,9 @@ void main() {
   float distanceUV = texture2D(uSdf, vUV).r / uSdfResolution.x;
   float distancePx = distanceUV * uOutputResolution.x;
 
-  vec2 shadowDirection = normalize(SHADOW_DIRECTION);
-  float shadowDistance = float(SHAODW_DISTANCE);
-  float shadowTolerance = float(SHADOW_EXTRA_WIDTH);
-  float shadowFalloff = float(SHADOW_FUZZINESS);
-  float textFalloff = float(TEXT_FUZZINESS);
-
-  float isText = smoothstep(textFalloff, 0., distancePx);
-  float shadowTexelDistancePx = texture2D(uSdf, vUV - shadowDirection * shadowDistance / uOutputResolution).r / uSdfResolution.x * uOutputResolution.x;
-  float isShadow = smoothstep(shadowFalloff, 0., shadowTexelDistancePx - shadowTolerance);
+  float isText = smoothstep(float(TEXT_FUZZINESS), 0., distancePx);
+  float shadowTexelDistancePx = texture2D(uSdf, vUV - normalize(SHADOW_DIRECTION) * float(SHAODW_DISTANCE) / uOutputResolution).r / uSdfResolution.x * uOutputResolution.x;
+  float isShadow = smoothstep(float(SHADOW_FUZZINESS), 0., shadowTexelDistancePx - float(SHADOW_EXTRA_WIDTH));
   isShadow *= (1. - isText);
 
   gl_FragColor = isText * TEXT_COLOR + isShadow * SHAODW_COLOR;

@@ -28,15 +28,14 @@ void main() {
   float distanceUV = texture2D(uSdf, vUV).r / uSdfResolution.x;
   float distancePx = distanceUV * uOutputResolution.x;
 
+  float isText = smoothstep(float(TEXT_FUZZINESS), 0., distancePx);
+  float isExtrusion = 0.;
+
   vec2 extrusionDirection = normalize(EXTRUSION_DIRECTION);
   float extrusionStart = float(EXTRUSION_START);
   float extrusionEnd = float(EXTRUSION_END);
   float extrusionFalloff = float(EXTRUSION_FUZZINESS);
-  float textFalloff = float(TEXT_FUZZINESS);
   float extrusionTolerance = float(EXTRUSION_EXTRA_WIDTH);
-
-  float isText = smoothstep(textFalloff, 0., distancePx);
-  float isExtrusion = 0.;
 
   vec2 extrusionUV = vUV;
   float extrudedDistancePx = 0.;
