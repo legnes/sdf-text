@@ -1,10 +1,12 @@
 const shader = `
 precision mediump float;
 
+////////////////////////////////
 // SETTINGS
 // colors are in RGBA
 // distances and fuzziness are in pixels
 // (of inherent resolution)
+////////////////////////////////
 const vec4 TEXT_COLOR = vec4(1, 0, 1, 1);
 const vec4 SHAODW_COLOR = vec4(0, 1, 1, 1);
 const vec2 SHADOW_DIRECTION = vec2(-1, 2);
@@ -12,6 +14,7 @@ const int SHAODW_DISTANCE = 60;
 const int SHADOW_EXTRA_WIDTH = -2;
 const int SHADOW_FUZZINESS = 5;
 const int TEXT_FUZZINESS = 2;
+////////////////////////////////
 
 varying vec2 vUV;
 

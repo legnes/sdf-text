@@ -1,10 +1,12 @@
 const shader = `
 precision mediump float;
 
+////////////////////////////////
 // SETTINGS
 // colors are in RGBA
 // distances and fuzziness are in pixels
 // (of inherent resolution)
+////////////////////////////////
 const vec4 TEXT_COLOR = vec4(1, 0, 1, 1);
 const vec4 RING_COLOR = vec4(0, 1, 1, 1);
 const int RING_PERIOD = 6;
@@ -14,6 +16,7 @@ const int TEXT_FUZZINESS = 2;
 const int RINGS_START = 6;
 const int RINGS_END = 8;
 const int RINGS_FADE = 8;
+////////////////////////////////
 
 varying vec2 vUV;
 

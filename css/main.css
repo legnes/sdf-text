@@ -29,6 +29,10 @@ html, body {
   font-weight: bold;
 }
 
+#textInput {
+  height: 10rem;
+}
+
 label {
   margin-bottom: 0.25rem;
 }

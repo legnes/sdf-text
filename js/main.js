@@ -12,28 +12,16 @@ import shaders from '../shaders/index.js';
 //      [ ] auto detect uniforms and add to UI?
 // [ ] Improve editor
 //      [ ] syntax highlighting
-// [X] Font inputs
-// [X] Editable shaders
-// [X] More shader variables
-//      [ ] time
-//      [X] tex res
-//      [X] out res
-// [X] Different shader styles
-//      [X] raw
-//      [X] outline
-//      [X] wordart
-//      [X] concentric
+// [] Different shader styles
 //      [ ] text gradient
 //      [ ] text pattern/image mask
 //      [ ] thinner/skeleton
 //      [ ] extrusion vanishing point
 //      [ ]
-// [X] Dynamic resolution (bypass sdf canvas)
-// [X] Quality slider (text canvas resolution)
 
 const state = {
   input: {
-    text: 'type',
+    text: 'type\nhere!',
     font: {
       style: 'normal',
       variant: 'normal',
@@ -92,6 +80,7 @@ const initDom = () => {
     state.glyphs.canvas.height = resolution;
     // seems like we have to reset this
     state.glyphs.ctx.textAlign = 'center';
+    state.glyphs.ctx.textBaseline = 'middle';
     updateFontAndRenderFull();
   });
 
@@ -125,6 +114,7 @@ const initDom = () => {
 const initGlyphs = () => {
   state.glyphs.ctx = state.glyphs.canvas.getContext('2d');
   state.glyphs.ctx.textAlign = 'center';
+  state.glyphs.ctx.textBaseline = 'middle';
   updateFont();
 };
 
@@ -185,8 +175,13 @@ const renderSdf = () => {
   }
 
   // Draw text to canvas and caputre
+  const lines = state.input.text.split('\n');
+  const middleLine = (lines.length - 1) / 2;
+  const lineHeight = state.input.font.size * state.glyphs.canvas.height / state.webgl.canvas.height;
   state.glyphs.ctx.clearRect(0, 0, glyphsWidth, glyphsHeight);
-  state.glyphs.ctx.fillText(state.input.text, glyphsWidth / 2, glyphsHeight / 2);
+  lines.forEach((line, idx) => {
+    state.glyphs.ctx.fillText(line, glyphsWidth / 2, glyphsHeight / 2 + (idx - middleLine) * lineHeight );
+  });
   const glyphImage = state.glyphs.ctx.getImageData(0, 0, glyphsWidth, glyphsHeight);
 
   // Generate sdf using a distance transform func to generate two unsigned distance fields
