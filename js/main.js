@@ -144,6 +144,7 @@ const updateShader = () => {
   state.input.shader.output.innerHTML = state.webgl.pipeline.error;
 };
 
+// With inspiration from
 // https://github.com/mapbox/tiny-sdf/blob/master/index.js
 // http://cs.brown.edu/people/pfelzens/papers/dt-final.pdf
 // https://github.com/Lisapple/8SSEDT
