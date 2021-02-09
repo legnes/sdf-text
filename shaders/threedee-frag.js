@@ -35,7 +35,9 @@ ${distance}
 
   // blinn phong
   // https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model
-  vec3 viewDirection = vec3(0, 0, 1);
+  vec3 camPos = vec3(.5 * uSdfResolution, 300);
+  vec3 fragPos = vec3(vUV * uSdfResolution, 0);
+  vec3 viewDirection = normalize(camPos - fragPos);
   vec3 halfAngle = normalize(normalize(LIGHT_DIR) + normalize(viewDirection));
   float specular = max(dot(halfAngle, normal), 0.0);
   specular = pow(specular, float(SHININESS));
