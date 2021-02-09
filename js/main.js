@@ -17,7 +17,7 @@ const state = {
       name: 'euclidean'
     },
     shader: {
-      name: 'threedee',
+      name: 'outline',
       editor: null,
       output: null
     },
