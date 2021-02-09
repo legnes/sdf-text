@@ -32,13 +32,12 @@ ${distance}
                        smoothstep(ringFalloff, 0., concentricPosition - ringRadius);
   float concentricFade = smoothstep(-concentricIndexFalloff, 0., concentricIndex - float(RINGS_START)) *
                          smoothstep(concentricIndexFalloff, 0., concentricIndex - float(RINGS_END));
-  vec4 ringColor = vec4(uEffectColor, concentricFade);
-  isConcentric *= (1. - isText);
+  isConcentric *= (1. - isText) * concentricFade;
 
   float isBackground = (1. - isText) * (1. - isConcentric);
 
   gl_FragColor = isText * vec4(uTextColor, 1) +
-                 isConcentric * ringColor +
+                 isConcentric * vec4(uEffectColor, 1) +
                  isBackground * vec4(uBackgroundColor, uBackgroundAlpha);
 }
 
