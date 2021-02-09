@@ -3,10 +3,6 @@ import { populateOptions, bindStateListener, hexToRgb } from './dom-utils.js';
 import distanceTransforms from './distance-transforms.js';
 import shaders from '../shaders/index.js';
 
-// [ ] Shaders
-//      [ ] shaped text (sdf val changes along axis)
-//      [ ] drips???
-
 const state = {
   input: {
     text: 'type\nhere!',
@@ -21,7 +17,7 @@ const state = {
       name: 'euclidean'
     },
     shader: {
-      name: 'outline',
+      name: 'threedee',
       editor: null,
       output: null
     },

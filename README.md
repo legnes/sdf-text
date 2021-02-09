@@ -4,6 +4,9 @@ Text-to-SDF generator with a live shader editor!
 
 ---
 
+Original paper
+- https://steamcdn-a.akamaihd.net/apps/valve/2007/SIGGRAPH2007_AlphaTestedMagnification.pdf
+
 Distance transforms based on algorithms in
 - http://cs.brown.edu/people/pfelzens/papers/dt-final.pdf
 
