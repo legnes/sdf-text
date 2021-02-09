@@ -157,6 +157,7 @@ export const render = (gl, pipeline, uniforms) => {
   if (pipeline.error) return;
 
   // TODO: add safety/checking?
+  // TODO: cache/check values?
   const uniformLocations = pipeline.uniformLocations || uniforms.map((uniform) => gl.getUniformLocation(pipeline.program, uniform.name));
   pipeline.uniformLocations = uniformLocations;
   uniforms.forEach((uniform, idx) => {

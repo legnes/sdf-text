@@ -30,7 +30,7 @@ html, body {
 }
 
 #textInput {
-  height: 8rem;
+  height: 6rem;
 }
 
 label {
@@ -38,8 +38,8 @@ label {
 }
 
 #glyphsCanvas {
-  width: 16rem;
-  height: 16rem;
+  width: 5rem;
+  height: 5rem;
   border: 1px solid black;
 }
 
@@ -50,7 +50,7 @@ label {
 }
 
 .editor {
-  width: 33rem;
+  width: 38rem;
   height: 80%;
   margin: 1rem 1rem 0 0;
 }

@@ -1,15 +1,15 @@
+import { header, distance } from './common-frag.js';
+
 const shader = `
 precision mediump float;
 
 ////////////////////////////////
 // SETTINGS
-// colors are in RGBA
+// colors are in RGB
 // distances and fuzziness are in pixels
 // (of inherent resolution)
 // direction will be normalized
 ////////////////////////////////
-const vec4 TEXT_COLOR = vec4(1, 0, 1, 1);
-const vec4 EXTRUSION_COLOR = vec4(0, 1, 1, 1);
 const vec2 EXTRUSION_DIRECTION = vec2(1, -4);
 const int EXTRUSION_START = 8;
 const int EXTRUSION_END = 70;
@@ -17,17 +17,9 @@ const int EXTRUSION_EXTRA_WIDTH = 1;
 const int EXTRUSION_FUZZINESS = 10;
 const int TEXT_FUZZINESS = 1;
 ////////////////////////////////
-
-varying vec2 vUV;
-
-uniform sampler2D uSdf;
-uniform vec2 uSdfResolution;
-uniform vec2 uOutputResolution;
-
+${header}
 void main() {
-  float distanceUV = texture2D(uSdf, vUV).r / uSdfResolution.x;
-  float distancePx = distanceUV * uOutputResolution.x;
-
+${distance}
   float isText = smoothstep(float(TEXT_FUZZINESS), 0., distancePx);
   float isExtrusion = 0.;
 
@@ -64,7 +56,11 @@ void main() {
   }
   isExtrusion *= (1. - isText);
 
-  gl_FragColor = isText * TEXT_COLOR + isExtrusion * EXTRUSION_COLOR;
+  float isBackground = (1. - isText) * (1. - isExtrusion);
+
+  gl_FragColor = isText * vec4(uTextColor, 1) +
+                 isExtrusion * vec4(uEffectColor, 1) +
+                 isBackground * vec4(uBackgroundColor, uBackgroundAlpha);
 }
 `;
 export default shader;

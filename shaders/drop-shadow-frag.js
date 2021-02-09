@@ -1,37 +1,33 @@
+import { header, distance } from './common-frag.js';
+
 const shader = `
 precision mediump float;
 
 ////////////////////////////////
 // SETTINGS
-// colors are in RGBA
+// colors are in RGB
 // distances and fuzziness are in pixels
 // (of inherent resolution)
 ////////////////////////////////
-const vec4 TEXT_COLOR = vec4(1, 0, 1, 1);
-const vec4 SHAODW_COLOR = vec4(0, 1, 1, 1);
 const vec2 SHADOW_DIRECTION = vec2(-1, 2);
 const int SHAODW_DISTANCE = 60;
 const int SHADOW_EXTRA_WIDTH = -2;
 const int SHADOW_FUZZINESS = 5;
 const int TEXT_FUZZINESS = 2;
 ////////////////////////////////
-
-varying vec2 vUV;
-
-uniform sampler2D uSdf;
-uniform vec2 uSdfResolution;
-uniform vec2 uOutputResolution;
-
+${header}
 void main() {
-  float distanceUV = texture2D(uSdf, vUV).r / uSdfResolution.x;
-  float distancePx = distanceUV * uOutputResolution.x;
-
+${distance}
   float isText = smoothstep(float(TEXT_FUZZINESS), 0., distancePx);
   float shadowTexelDistancePx = texture2D(uSdf, vUV - normalize(SHADOW_DIRECTION) * float(SHAODW_DISTANCE) / uOutputResolution).r / uSdfResolution.x * uOutputResolution.x;
   float isShadow = smoothstep(float(SHADOW_FUZZINESS), 0., shadowTexelDistancePx - float(SHADOW_EXTRA_WIDTH));
   isShadow *= (1. - isText);
 
-  gl_FragColor = isText * TEXT_COLOR + isShadow * SHAODW_COLOR;
+  float isBackground = (1. - isText) * (1. - isShadow);
+
+  gl_FragColor = isText * vec4(uTextColor, 1) +
+                 isShadow * vec4(uEffectColor, 1) +
+                 isBackground * vec4(uBackgroundColor, uBackgroundAlpha);
 }
 `;
 export default shader;

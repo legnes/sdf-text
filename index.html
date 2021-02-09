@@ -47,6 +47,26 @@
         </label>
       </div>
       <div class="input-section">
+        <span class="input-section-header">color settings</span>
+        <span>(check out the live shader editor too!)</span>
+        <label>
+          text color
+          <input id="textColorInput" type="color"></input>
+        </label>
+        <label>
+          effect color
+          <input id="effectColorInput" type="color"></input>
+        </label>
+        <label>
+          background color
+          <input id="backgroundColorInput" type="color"></input>
+        </label>
+        <label>
+          transparent background
+          <input id="backgroundTransparencyInput" type="checkbox"></input>
+        </label>
+      </div>
+      <div class="input-section">
         <span class="input-section-header">font settings</span>
         <label>
           family
@@ -92,7 +112,10 @@
           </select>
         </label>
       </div>
-      <canvas id="glyphsCanvas" width="256" height="256"></canvas>
+      <div class="input-section">
+        <span class="input-section-header">text preview</span>
+        <canvas id="glyphsCanvas" width="256" height="256"></canvas>
+      </div>
     </div>
     <div id="editorContainer" class="hidden">
       <textarea id="shaderEditor" class="editor"></textarea>

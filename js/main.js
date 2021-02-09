@@ -1,12 +1,11 @@
 import { createContext, createStaticScene, createOrUpdatePipeline, updateTexture, render, resize } from './webgl-utils.js';
-import { populateOptions, bindStateListener } from './dom-utils.js';
+import { populateOptions, bindStateListener, hexToRgb } from './dom-utils.js';
 import distanceTransforms from './distance-transforms.js';
 import shaders from '../shaders/index.js';
 
-// To Do
-// [ ] Shader control
-//      [ ] add UI for some uniforms (color? distance?)
-//      [ ] auto detect uniforms and add to UI?
+// [ ] Shaders
+//      [ ] shaped text (sdf val changes along axis)
+//      [ ] drips???
 
 const state = {
   input: {
@@ -25,6 +24,12 @@ const state = {
       name: 'outline',
       editor: null,
       output: null
+    },
+    colors: {
+      textColor: '#ff00ff',
+      effectColor: '#00ffff',
+      backgroundColor: '#000000',
+      transparentBackground: true
     }
   },
   glyphs: {
@@ -44,6 +49,22 @@ const state = {
       {
         name: 'uOutputResolution',
         values: [-1, -1]
+      },
+      {
+        name: 'uTextColor',
+        values: [1, 1, 1]
+      },
+      {
+        name: 'uEffectColor',
+        values: [1, 1, 1]
+      },
+      {
+        name: 'uBackgroundColor',
+        values: [1, 1, 1]
+      },
+      {
+        name: 'uBackgroundAlpha',
+        values: [1]
       }
     ]
   },
@@ -62,6 +83,12 @@ const initDom = () => {
 
   populateOptions('#distanceTransformSelect', distanceTransforms, state.input.distanceTransform.name);
   bindStateListener('#distanceTransformSelect', 'change', 'input.distanceTransform.name', renderFull, state);
+
+  bindStateListener('#textColorInput', 'input', 'input.colors.textColor', updateColorUniformsAndRenderWebgl, state);
+  bindStateListener('#effectColorInput', 'input', 'input.colors.effectColor', updateColorUniformsAndRenderWebgl, state);
+  bindStateListener('#backgroundColorInput', 'input', 'input.colors.backgroundColor', updateColorUniformsAndRenderWebgl, state);
+  bindStateListener('#backgroundTransparencyInput', 'change', 'input.colors.transparentBackground', updateColorUniformsAndRenderWebgl, state);
+  updateColorUniforms();
 
   document.querySelector('#sdfResolution').addEventListener('change', (evt) => {
     const resolution = parseInt(evt.target.value);
@@ -130,6 +157,18 @@ const updateFont = () => {
 const updateFontAndRenderFull = () => {
   updateFont();
   renderFull();
+};
+
+const updateColorUniforms = () => {
+  hexToRgb(state.webgl.uniforms[2].values, state.input.colors.textColor);
+  hexToRgb(state.webgl.uniforms[3].values, state.input.colors.effectColor);
+  hexToRgb(state.webgl.uniforms[4].values, state.input.colors.backgroundColor);
+  state.webgl.uniforms[5].values[0] = state.input.colors.transparentBackground ? 0 : 1;
+};
+
+const updateColorUniformsAndRenderWebgl = () => {
+  updateColorUniforms();
+  renderWebgl();
 };
 
 const loadShader = () => {

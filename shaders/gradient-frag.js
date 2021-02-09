@@ -1,42 +1,33 @@
+import { header, distance } from './common-frag.js';
+
 const shader = `
 precision mediump float;
-
+${header}
 ////////////////////////////////
 // SETTINGS
-// colors are in RGBA
+// colors are in RGB
 // distances and fuzziness are in pixels
 // (of inherent resolution)
 ////////////////////////////////
-const vec4 BACKGROUND_COLOR = vec4(0, 0, 0, 1);
-const vec4 COLOR_A = vec4(1, 0, 1, 1);
-const vec4 COLOR_B = vec4(0, 1, 1, 1);
 const int FUZZINESS = 120;
 
-vec4 gradient(vec2 uv) {
+vec3 gradient(vec2 uv) {
   // vertical
-  // return mix(COLOR_A, COLOR_B, uv.y);
+  // return mix(uTextColor, uEffectColor, uv.y);
 
   // horizontal
-  // return mix(COLOR_A, COLOR_B, uv.x);
+  // return mix(uTextColor, uEffectColor, uv.x);
 
   // center
-  return mix(COLOR_A, COLOR_B, distance(uv, vec2(0.5)) * 2.);
+  return mix(uTextColor, uEffectColor, distance(uv, vec2(0.5)) * 2.);
 }
 ////////////////////////////////
 
-varying vec2 vUV;
-
-uniform sampler2D uSdf;
-uniform vec2 uSdfResolution;
-uniform vec2 uOutputResolution;
-
 void main() {
-  float distanceUV = texture2D(uSdf, vUV).r / uSdfResolution.x;
-  float distancePx = distanceUV * uOutputResolution.x;
-
+${distance}
   float isText = smoothstep(float(FUZZINESS), 0., distancePx);
 
-  gl_FragColor = mix(BACKGROUND_COLOR, gradient(vUV), isText);
+  gl_FragColor = mix(vec4(uBackgroundColor, uBackgroundAlpha), vec4(gradient(vUV), 1), isText);
 }
 
 `;

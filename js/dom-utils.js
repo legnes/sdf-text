@@ -20,11 +20,12 @@ const deepSet = (obj, path, val) => {
 
 export const bindStateListener = (selector, eventName, statePath, callback, state) => {
   const elt = document.querySelector(selector);
+  const valueProp = elt.type === 'checkbox' ? 'checked' : 'value';
   elt.addEventListener(eventName, (evt) => {
-    deepSet(state, statePath, evt.target.value);
+    deepSet(state, statePath, evt.target[valueProp]);
     callback();
   });
-  elt.value = deepGet(state, statePath);
+  elt[valueProp] = deepGet(state, statePath);
 };
 
 export const populateOptions = (selectSelector, optionsObj, initialVal) => {
@@ -35,4 +36,11 @@ export const populateOptions = (selectSelector, optionsObj, initialVal) => {
     elt.add(option);
   }
   elt.value = initialVal;
+};
+
+export const hexToRgb = (rgb, hex) => {
+  const components = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  rgb[0] = parseInt(components[1], 16) / 255;
+  rgb[1] = parseInt(components[2], 16) / 255;
+  rgb[2] = parseInt(components[3], 16) / 255;
 };
